@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and settings",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "employee"] },
+        "attendanceId": { "type": "string", "description": "ID in the external attendance system (e.g., 001)" },
+        "salaryType": { "type": "string", "enum": ["daily", "monthly"] },
+        "baseSalary": { "type": "number", "description": "Daily rate or monthly salary" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "AttendanceRecord": {
+      "title": "Attendance Record",
+      "description": "A single day's attendance record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Reference to User UID" },
+        "attendanceId": { "type": "string", "description": "The external system ID" },
+        "date": { "type": "string", "description": "YYYY-MM-DD" },
+        "clockIn": { "type": "string", "format": "date-time" },
+        "clockOut": { "type": "string", "format": "date-time" },
+        "workHours": { "type": "number", "description": "Calculated hours worked" }
+      },
+      "required": ["userId", "attendanceId", "date"]
+    },
+    "PayrollRecord": {
+      "title": "Payroll Record",
+      "description": "Calculated salary for a specific month",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "month": { "type": "string", "description": "YYYY-MM" },
+        "totalDays": { "type": "number" },
+        "totalHours": { "type": "number" },
+        "calculatedSalary": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "paid"] }
+      },
+      "required": ["userId", "month", "calculatedSalary", "status"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user profiles and their attendance/salary settings."
+    },
+    "attendance_records/{recordId}": {
+      "schema": { "$ref": "#/entities/AttendanceRecord" },
+      "description": "Stores individual attendance records."
+    },
+    "payroll_records/{recordId}": {
+      "schema": { "$ref": "#/entities/PayrollRecord" },
+      "description": "Stores monthly payroll calculations."
+    }
+  }
+}
